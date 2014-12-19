@@ -1,5 +1,5 @@
-build_inverted_index.py : builds index of terms and document IDs
-search_populate.py : populated mongodb collections
-search_query.py : executes a keyword search, returns HTML-formatted results
-  -> python search_query.py search_term > results.html'
+build_inverted_index.py : builds index of terms and document IDs<br>
+search_populate.py : populated mongodb collections<br>
+search_query.py : executes a keyword search, returns HTML-formatted results<br>
+  -> python search_query.py search_term > results.html'<br>
   
