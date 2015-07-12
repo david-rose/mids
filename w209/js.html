@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<head>
+  <title>Javascript Tutorial Exercise</title>
+  <link rel="stylesheet" href="basic.css">
+</head>
+<body>
+  <div id = "header">
+    <h2>Javascript Tutorial Exercise</h2>
+  </div>
+  <div id = "nav">
+    <a href = "http://en.wikipedia.org/wiki/Information_visualization#Applications">Wikipedia InfoVis Applications</a>
+    <br/>
+    <a href="http://www.bigtreestudio.com/FreedomLG.jpg" target="_blank">Opens in New Tab</a>
+  </div>
+  <div id = "section">
+    <table id = "dtable">
+      <tr>
+        <th>Col A</th>
+        <th>Col B</th>
+      </tr>
+      <tr>
+        <td>1A</td>
+        <td>1B</td>
+      </tr>
+      <tr class = "alt">
+        <td>2A</td>
+        <td>2B</td>
+      </tr>
+    </table>
+    <br/>
+    <form action = "js.html" method = "post">
+      <p>Text: <input type= "text"></p>
+      <p>Button: <input type = "submit" value = "Go"></p>
+      <p>Another: <input type = "submit" value = "Don't Go"></p>
+    </form>
+    <div id = "converter">
+      <script>
+      function rawConvert(value, srcUnits)
+      {
+        r = value;
+        if (srcUnits == 'f')
+        {
+          r = (value - 32) * 5/9;
+        }
+        else
+        {
+          r = ((9/5) * value) + 32;
+        }
+        return r;
+      }
+                
+      function tConvert(el, target) {
+        v = el.value;
+        re = /^\s*([+-]*\d+\.{0,1}\d*)\s*(c|f)\s*$/i; // an optionally signed number followed by a scale indicator
+        ar = re.exec(v);
+        rv = ''
+        if (ar == null) {
+          rv = "bad format: " + v;
+        }
+        else {
+          temp = rawConvert(ar[1], ar[2].toLowerCase())
+          if (ar[2].toLowerCase() == 'f') {
+            scale = 'C'
+          }
+          else {
+            scale = 'F'
+          }
+          rv = Math.round(temp) + ' ' + scale
+        }
+        document.getElementById(target).value = rv;
+        if (ar != null) {
+          document.getElementById(el.id).value = ar[1] + ' ' + ar[2].toUpperCase()
+        }
+        document.getElementById(el.id).focus()
+      }
+      </script>
+      <p>Enter a temperature, including unit type (C or F)
+        <input type="text" id ="tempIn"
+               onchange = "tConvert(this, 'tempOut')">
+         &#8658;  
+        <input type ="text" id="tempOut" readonly="true">
+      </p>
+    </div>
+  </div>
+  <div id ="section" >
+    <p>Enter Degrees: <input type="number" id="tDegrees" onkeyup="this.value=this.value.replace(/[^\d\.]/,'')">
+    </p>
+    <input type="radio" name="tUnits" value="C"
+           onClick ="document.getElementById('tempC').innerHTML = rawConvert(document.getElementById('tDegrees').value, 'f');
+                     document.getElementById('tempF').innerHTML = '';">
+    C
+    <input type="radio" name="tUnits" value="F"
+           onClick ="document.getElementById('tempF').innerHTML = rawConvert(document.getElementById('tDegrees').value, 'c');
+                     document.getElementById('tempC').innerHTML = '';">
+    F
+    &nbsp;&nbsp;
+    <span id="tempF" ></span>
+    <span id="tempC" ></span>
+    
+  </div>
+  <div id = "footer">
+    david dot rose at ischool dot berkeley dot edu
+  </div>
+</body>

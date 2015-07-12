@@ -1,0 +1,56 @@
+
+body {
+    background-color: #ffffff;
+    font-size: medium;
+    color: black;
+    font-family: arial, helvetica, serif;    
+}
+#header {
+    background-color:black;
+    color:white;
+    text-align:center;
+    padding:5px;
+}
+#nav {
+    line-height:30px;
+    background-color:#eeeeee;
+    height:300px;
+    width:200px;
+    float:left;
+    padding:5px; 
+}
+#section {
+    width:350px;
+    float:left;
+    padding:10px; 
+}
+#footer {
+    background-color:black;
+    color:white;
+    clear:both;
+    text-align:center;
+    padding:5px; 
+}
+table {
+    border: 1px solid black;
+}
+#dtable {
+    width: 40%;
+    border-collapse: collapse;
+}
+#dtable td, #dtable th {
+    border: 1px solid black;
+    text-align: center;
+}
+#dtable tr.alt td {
+    color: #000000;
+    background-color: #eeeeee;
+}
+#tempF {
+    font-size: x-large;
+    color: green;
+}
+#tempC {
+    font-size: x-large;
+    color: blue;
+}
