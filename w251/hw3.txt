@@ -1,0 +1,31 @@
+# create the CCI
+slcli vs create -d wdc01 --os CENTOS_LATEST --cpu 1 --memory 4096 --hostname saltmaster --domain someplace.net --key softlayer_key
+
+:.........:......................................:
+:    name : value                                :
+:.........:......................................:
+:      id : 9615143                              :
+: created : 2015-05-27T08:48:15-05:00            :
+:    guid : 77562581-f4d6-4275-986c-8c6d8d2737e9 :
+:.........:......................................:
+
+public IP: 108.168.171.28
+private IP: 10.56.254.136
+
+# ssh into machine
+ssh root@108.168.171.28
+
+...
+
+./stack.sh
+
+This is your host ip: 108.168.171.28
+Horizon is now available at http://108.168.171.28/
+Keystone is serving at http://108.168.171.28:5000/
+The default users are: admin and demo
+The password: stack
+
+sudo iptables -F INPUT
+
+heat --os-username=admin --os-password=stack --os-tenant-name=admin --os-auth-url=http://10.77.162.19:5000 stack-list
+

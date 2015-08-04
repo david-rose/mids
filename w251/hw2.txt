@@ -1,0 +1,55 @@
+
+# export variables for SoftLayer User and API Key
+
+export U=SL538869
+export K=e889b96924cb4d99edf9602cb788c3b9b434c6f3ae1ad0b7873580560379e458
+
+# order an Object Storage account
+
+curl --user $U:$K https://api.softlayer.com/rest/v3.1/SoftLayer_Product_Order/placeOrder --data @-  | jq -r '.placedOrder.items[] | select(.itemId == 4069) | {id}'
+{"parameters" : [
+  {
+	"complexType": "SoftLayer_Container_Product_Order_Network_Storage_Hub",
+	"quantity": 1,
+	"packageId": 0,
+	"prices": [{ "id": 16984}]
+   }
+]}
+
+
+>> order item id: 67457783
+
+# retrieve storage account username
+curl --user $U:$K 'https://api.softlayer.com/rest/v3.1/SoftLayer_Account/getHubNetworkStorage.json?objectMask=id;username;billingItem.id;billingItem.orderItemId' | jq -r '.[] | select(.billingItem.orderItemId == 67457783) | {username}'
+
+
+>> username: SLOS538869-2
+
+# obtain temporary authentication token
+
+curl -i -H "X-Auth-User:SLOS538869-2:$U" -H "X-Auth-Key:$K" https://dal05.objectstorage.softlayer.net/auth/v1.0
+
+>> X-Auth-Token: AUTH_tk79cd34d31f7f47438509af57bd790329
+>> X-Storage-Url: https://dal05.objectstorage.softlayer.net/v1/AUTH_2667caf7-72d7-44ea-a7e7-e7ea0bd94abb
+
+# create a container named 'myfiles'
+
+curl -i -X PUT -H "X-Auth-Token: AUTH_tk79cd34d31f7f47438509af57bd790329" https://dal05.objectstorage.softlayer.net/v1/AUTH_2667caf7-72d7-44ea-a7e7-e7ea0bd94abb/myfiles
+
+# list containers
+
+curl -i -H "X-Auth-Token: AUTH_tk79cd34d31f7f47438509af57bd790329" https://dal05.objectstorage.softlayer.net/v1/AUTH_2667caf7-72d7-44ea-a7e7-e7ea0bd94abb
+
+
+
+# for swift package, export some credentials
+
+export ST_AUTH=https://dal05.objectstorage.softlayer.net/auth/v1.0
+export ST_USER=SLOS538869-2:SL538869
+export ST_KEY=e889b96924cb4d99edf9602cb788c3b9b434c6f3ae1ad0b7873580560379e458
+
+# list containers
+swift list
+
+
+
