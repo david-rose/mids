@@ -16,7 +16,7 @@ echo "$DEV /data ext4 defaults,noatime 0 0" >> /etc/fstab
 # mount the directory
 mount /data
 
-# install ntp server, which seems to be missing
+# install ntp server, which may be missing
 yum install -y ntp
 /etc/init.d/ntpd restart
 
@@ -56,7 +56,15 @@ echo \
 
 cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
-chmod 640 ~/.ssh/*
+chmod 600 ~/.ssh/*
+
+# disable iptables, per Ambari instructions
+chkconfig iptables off
+/etc/init.d/iptables stop
+
+#  epel repository
+wget http://mirror.sfo12.us.leaseweb.net/epel/6/i386/epel-release-6-8.noarch.rpm
+rpm -Uvh epel-release-6-8.noarch.rpm
 
 touch ~/provision_success
 
