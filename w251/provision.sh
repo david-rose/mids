@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # create an entry for the data directory
 mkdir -m 777 /data
 
@@ -25,4 +27,5 @@ mount /data
 yum install -y ntp
 /etc/init.d/ntpd restart
 
+touch ~/provision_success
 
