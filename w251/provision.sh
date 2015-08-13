@@ -20,6 +20,8 @@ mount /data
 yum install -y ntp
 /etc/init.d/ntpd restart
 
+mkdir -m 700 ~/.ssh
+
 echo \
 '-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAtLBezA7VrNZ62sHutshJ7djojBc3MH9mjfMP0wW0J4bdh8Nm
@@ -54,7 +56,6 @@ echo \
 
 cat ~/.ssh/foobar_rsa.pub >> ~/.ssh/known_hosts_foobar
 
-chmod 700 ~/.ssh
 chmod 640 ~/.ssh/*
 
 touch ~/provision_success
