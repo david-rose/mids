@@ -49,12 +49,12 @@ GDAXut/ecdYJRZHAZYj4jZbyO/p7RCk/5rIav+WGmAy3p5SaFlXv+GvK1Mt9fnLs
 MOmSQQKBgQDmzmtxpG2RqIUGzsP3kchLsbi65drEElwL1WQvJdpvT+8Gq7bUYLi/
 5iLwsysd4lGcE1n8KdjRbwgSxhDgnW73hLCUiW1xb5/Hz6+Yi3X3bAhEumyi0gRb
 kqf6RqPFlDgt8m0+9mKrbaB9VYiH+WJygL4dOyHDs9reA9LjV3No1w==
------END RSA PRIVATE KEY-----' > ~/.ssh/foobar_rsa
+-----END RSA PRIVATE KEY-----' > ~/.ssh/id_rsa
 
 echo \
-'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0sF7MDtWs1nrawe62yEnt2OiMFzcwf2aN8w/TBbQnht2Hw2ZyZfpiH9jY7WvMgYtjIYoGekMPGSZiSkR32DwtRaZMbz/DrAIHxaE4U/oFWgWbKAcbPi/QUCUnM9UKALiah9GRCPwVGFnOtN0M2F2YeULm/M8IyFhUqjIJMlVGcIpeU0DxAQL8PZ2XWC7xJsLHaxKlcK1Ny8Z4Xz76Xt+38DzO7tfhMVqWv4Olt4Cir/ENC6SVZGgabKy2t/cyfWmKUPrY3dqudGNIMiHyYv5vy3mrZDu7UiDXuUuVb8FOPVtBJFoWZW2D2/ok1fbD+81SrVSTD1pVVCbBJM4tIZJF david@DataSci.local' > ~/.ssh/foobar_rsa.pub
+'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC0sF7MDtWs1nrawe62yEnt2OiMFzcwf2aN8w/TBbQnht2Hw2ZyZfpiH9jY7WvMgYtjIYoGekMPGSZiSkR32DwtRaZMbz/DrAIHxaE4U/oFWgWbKAcbPi/QUCUnM9UKALiah9GRCPwVGFnOtN0M2F2YeULm/M8IyFhUqjIJMlVGcIpeU0DxAQL8PZ2XWC7xJsLHaxKlcK1Ny8Z4Xz76Xt+38DzO7tfhMVqWv4Olt4Cir/ENC6SVZGgabKy2t/cyfWmKUPrY3dqudGNIMiHyYv5vy3mrZDu7UiDXuUuVb8FOPVtBJFoWZW2D2/ok1fbD+81SrVSTD1pVVCbBJM4tIZJF david@DataSci.local' > ~/.ssh/id_rsa.pub
 
-cat ~/.ssh/foobar_rsa.pub >> ~/.ssh/known_hosts_foobar
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 chmod 640 ~/.ssh/*
 
