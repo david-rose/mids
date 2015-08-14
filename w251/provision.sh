@@ -16,10 +16,6 @@ echo "$DEV /data ext4 defaults,noatime 0 0" >> /etc/fstab
 # mount the directory
 mount /data
 
-# install ntp server, which may be missing
-yum install -y ntp
-/etc/init.d/ntpd restart
-
 mkdir -m 700 ~/.ssh
 
 echo \
@@ -48,7 +44,7 @@ o1rb7p/opXfCbDGqEYPOff+t1HQHYR0Q8Ofi3Kp4B8qCIN8gDWnZvf8o+LYh7WbH
 GDAXut/ecdYJRZHAZYj4jZbyO/p7RCk/5rIav+WGmAy3p5SaFlXv+GvK1Mt9fnLs
 MOmSQQKBgQDmzmtxpG2RqIUGzsP3kchLsbi65drEElwL1WQvJdpvT+8Gq7bUYLi/
 5iLwsysd4lGcE1n8KdjRbwgSxhDgnW73hLCUiW1xb5/Hz6+Yi3X3bAhEumyi0gRb
-kqf6RqPFlDgt8m0+9mKrbaB9VYiH+WJygL4dOyHDs9reA9LjV3No1w==
+xvfkqf6RqPFlDgt8m0+9mKrbaB9VYiH+WJygL4dOyHDs9reA9LjV3No1w==
 -----END RSA PRIVATE KEY-----' > ~/.ssh/id_rsa
 
 echo \
@@ -58,13 +54,18 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 chmod 600 ~/.ssh/*
 
+# install ntp server
+yum install -y ntp
+/etc/init.d/ntpd restart
+
 # disable iptables, per Ambari instructions
 chkconfig iptables off
 /etc/init.d/iptables stop
 
-#  epel repository
+#  install epel repository
 wget http://mirror.sfo12.us.leaseweb.net/epel/6/i386/epel-release-6-8.noarch.rpm
 rpm -Uvh epel-release-6-8.noarch.rpm
 
+# leave some evidence
 touch ~/provision_success
 
