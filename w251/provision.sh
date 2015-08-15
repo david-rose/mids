@@ -66,6 +66,15 @@ chkconfig iptables off
 wget http://mirror.sfo12.us.leaseweb.net/epel/6/i386/epel-release-6-8.noarch.rpm
 rpm -Uvh epel-release-6-8.noarch.rpm
 
+# install java
+yum install -y java-1.8.0-openjdk-headless'
+echo export JAVA_HOME=\"$(readlink -f $(which java) | grep -oP '.*(?=/bin)')\" >> /root/.bash_profile
+
+# install spark
+curl http://d3kbcqa49mib13.cloudfront.net/spark-1.3.1-bin-hadoop2.6.tgz | tar -zx -C /usr/local --show-transformed --transform='s,/*[^/]*,spark,'
+echo export SPARK_HOME=\"/usr/local/spark\" >> /root/.bash_profile
+
+
 # leave some evidence
 touch ~/provision_success
 
