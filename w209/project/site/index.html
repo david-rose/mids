@@ -1,0 +1,1182 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Visualizing Electricity</title>
+
+    <!-- Bootstrap Core CSS -->
+	<!--    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">-->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap-select.min.css" rel="stylesheet">
+    <!-- Fonts -->
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link href="css/animate.css" rel="stylesheet" />
+    <!-- Squad theme CSS -->
+    <link href="css/style.css" rel="stylesheet">
+	<link href="color/default.css" rel="stylesheet">
+
+    <link rel="stylesheet" type="text/css" href="css/d3.slider.css" media="screen" />
+
+    <style>
+        body {
+            font: 11px sans-serif;
+        }
+
+        .node rect {
+            fill-opacity: .9;
+            shape-rendering: crispEdges;
+        }
+
+        .node text {
+            pointer-events: none;
+            //text-shadow: 0 1px 0 #fff;
+            font-weight: bold;
+        }
+
+        .node rect:hover {
+            fill-opacity: .6;
+            stroke-width: 2;
+            font-weight: bold;
+        }
+
+        .link {
+            fill-opacity: .2;
+            stroke: none;
+            stroke-opacity: .2;
+        }
+
+            .link:hover {
+                fill-opacity: .5;
+            }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 10px;
+            transform: rotate(0deg);
+        }
+
+        .datarect {
+            fill: steelblue;
+        }
+
+            .datarect:hover {
+               
+                fill: #bbbbbb;
+            }
+
+        .title {
+            font: 18px sans-serif;
+        }
+
+        /*#center_elements {
+            display: table;
+           
+         
+        }*/
+
+        #wheel {
+            //border: thin solid #A8A8A8;
+        }
+
+        .bleh:hover {
+            fill: url(#hover_gradient);
+        }
+
+        .up-down {
+            background: rgba(112, 112, 112, 0.5);
+            color: #fff;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            padding-right: 150px;
+            padding-left: 150px;
+        }
+
+            .up-down:hover {
+                border: none;
+                background: rgba(112, 112, 112, 1);
+            }
+
+        .axis line {
+            stroke: #E5E5E5;
+            stroke-opacity: .5;
+            shape-rendering: crispEdges;
+        }
+
+        .selectTitle {
+			padding-bottom: 4px;
+			padding-left: 5px;
+        }
+
+     .fact-box { margin:10px; padding:10px; }
+     
+	 .instructions {
+       padding:20px;
+       font-size:14px;
+     }
+
+	.underline {
+		text-decoration: underline;
+	}
+
+	.inlineBlock {
+		display:inline-block;
+	}
+	
+	.text-to-columns {
+	   -webkit-column-count: 2;
+		  -moz-column-count: 2;
+			   column-count: 2;
+
+	   -webkit-column-gap: 20px;
+		  -moz-column-gap: 20px;
+			   column-gap: 20px;
+	}
+    </style>
+	
+</head>
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-custom">
+	<!-- Preloader -->
+	<div id="preloader">
+	  <div id="load"></div>
+	</div>
+
+    <nav class="navbar navbar-custom navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header page-scroll">
+                <a class="navbar-brand" href="index.html">
+                    <h1>Electricity</h1>
+                </a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-right navbar-main-collapse">
+                <ul class="nav navbar-nav">
+					<li class="active"><a href="#intro">Home</a></li>
+					<li><a href="#visual">Visualization</a></li>
+					<li><a href="#about">About</a></li>
+					<!--<li><a href="#about">About Us</a></li>	
+                    li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">Example menu</a></li>
+                            <li><a href="#">Example menu</a></li>
+                            <li><a href="#">Example menu</a></li>
+                        </ul-->
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+	<!-- Section: Title on top of Image -->
+    <section id="top-title" class="intro" style="height: 300px; padding-top: 150px;">
+		<div class="slogan fluid ">
+			<h2>Electricity</h2>
+		</div>
+    </section>
+	
+	<!-- /Section: intro -->
+    <!--<section id="intro" class="home-section ">
+        <div class="container">
+            <div class="row">
+				<h3 class="text-center" > Electricity has emerged as a popular alternative to fossil fuels, <br>but how clean and sustainable is it? </h3>
+				<p style="font-size: 18px; "> Few people know how electricity is produced, how production differs between countries and regions, 
+				and what proportion of it is being consumed by industry and households. To answer these questions, we created a visualization that lets you explore how electricity is produced and consumed, by who, and the trends over time.
+				<br><br>Before you do some exploration of your own, here are some interesting facts that we found along the way. <br></p>
+				<br>
+            </div>    
+			<div class="row text-center" >
+				<div class="col-sm-4">
+					<div class="wow fadeInLeft" data-wow-delay="0.2s">
+						<div class="fact-box">
+								<h5 style="font-size: 18px;">Key Fact #1</h5>
+								<p style="font-size: 18px; ">In 2012, only 20% of the world's electricity was produced by renewable means</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="wow fadeInUp" data-wow-delay="0.2s">
+						<div class="fact-box">
+								<h5 style="font-size: 18px;">Key Fact #2</h5>
+								<p style="font-size: 18px; ">Hydroelectric plants account for XX% of renewable production</p>
+							
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-4">
+					<div class="wow fadeInUp" data-wow-delay="0.2s">
+						<div class="fact-box">
+						   
+								<h5 style="font-size: 18px;">Key Fact #3</h5>
+								<p style="font-size: 18px; ">MISSING...</p>
+						   
+						</div>
+					</div>
+				</div>
+			</div>
+			
+        </div>
+        <hr />
+
+    </section>-->
+
+	<!-- Section: visualization -->
+	<section id="intro" class="home-section text-center">
+		<div class="container">
+			<div class="row">
+				<h3 class="text-center" > Electricity has emerged as a popular alternative to fossil fuels, <br>but how clean and sustainable is it? </h3>
+				<p style="font-size: 18px; "> Few people know how electricity is produced, how production differs between countries and regions, 
+				and what proportion of it is being consumed by industry and households. To answer these questions, we created a visualization that lets you explore how electricity is produced and consumed, by who, and the trends over time.
+				  </p>
+				<br>
+            </div>  
+		</div>
+            
+		<script>
+		//<a class="text-center" id="showHideLink" onclick="showHide()" style="font-size: 18px;">Hide Instructions</a>
+			function showHide() {
+				if ($("#guide").is(":visible")) {
+					$("#guide").hide();
+
+					$("#showHideLink").text("Show Instructions");
+
+				} else {
+					$("#guide").show();
+
+					$("#showHideLink").text("Hide Instructions");
+				}
+			}
+		</script>
+		
+		<!-- intro text and code -->		
+		<div id="guide" class="container text-left">
+			<div class="row instructions text-to-columns">
+				<p>The visualization below presents the opportunity to explore the world's electricity production and usage.
+				The visualization has 4 main components: one wheel, two flow diagrams, and a top-5 ranking area.</p>
+					<p> <b>Wheel</b> &#8212 Located at the center, the wheel shows the electric production and consumption for a given region. For the selected year, the  
+					4 years before and after the are also displayed to show the trend over time. 
+					The years can be navigated by using the up/down arrows or the year slider at the bottom.</p>
+					
+					<p> <b>Flow Diagrams</b> &#8212 The flow diagrams show the elements that constitute the production and consumption sides for the selected year.
+					The production elements are located at the left of the wheel, while the consumption elements are at the right of the wheel.
+					Countries were grouped according to the <a href="http://millenniumindicators.un.org/unsd/methods/m49/m49regin.htm">United Nations regional groups</a>. 
+					Energy classes were taken from the categories present in the data. For the production side, the energy classes describe the process by which the energy is produced
+					(for example, hydroelectric, nuclear, or combustion form of generation). Similarly, for the consumption side, the energy classes describe how the electricity 
+					is consumed (for example, by households or service providers).</p>
+					<p> Each element is represented with a colored, vertical bar. The associations between elements that compose another element are shown with gray, connecting flows.</p>
+					
+					<p><b>Top-5 Ranking</b> &#8212 Located at the bottom, the ranking area shows the top-5 countries ranked according to total consumption, total production, and production 
+					by renewable processes, nuclear process, and combustion processes. </p>
+				
+				<p>The following options are provided via dropdown menus:
+					<br> &#9654 Region:  UN standard regions and subregions available
+					<br> &#9654 Year:  Focus year ranging from 1990 to 2012
+					<br> &#9654 Units:  Display electricity in terms of absolute values (kilowatt hours - kWh) or per capita values (kWh per capita). 
+					For per capita values, the population is the population for the region, sub-region, or country being displayed.
+					<br> &#9654 Outermost Category:  Select which category to show in the outermost level of the flow diagrams. 
+					Change the category to see how the proportions vary within an element.
+				</p>
+			</div>
+			<hr id="visual">
+		</div>
+		
+		<div  style="clear:both"></div>
+		
+		<!-- visualization code -->
+		<!-- dropdown boxes -->
+		<div class="container text-left" style="padding-bottom: 30px; padding-top: 25px;">
+		 
+		 <div class="options row">
+			<div class="col-lg-3">
+			<span>
+				<span class="selectTitle inlineBlock" >Region</span><br>
+				<select id="region" onchange="updatedata()" class="selectpicker">
+					<option value="World">World</option>
+					<option value="Africa">Africa</option>
+					<option value="Eastern Africa">&middot; Eastern Africa</option>
+					<option value="Middle Africa">&middot; Middle Africa</option>
+					<option value="Northern Africa">&middot; Northern Africa</option>
+					<option value="Southern Africa">&middot; Southern Africa</option>
+					<option value="Western Africa">&middot; Western Africa</option>
+					<option value="Americas">Americas</option>
+					<option value="Caribbean">&middot; Caribbean</option>
+					<option value="Central America">&middot; Central America</option>
+					<option value="Northern America">&middot; Northern America</option>
+					<option value="South America">&middot; South America</option>
+					<option value="Asia">Asia</option>
+					<option value="Central Asia">&middot; Central Asia</option>
+					<option value="Eastern Asia">&middot; Eastern Asia</option>
+					<!--
+					<option value="China" style="display:none;" >&middot; &middot; China</option>
+					<option value="Japan">&middot; &middot; Japan</option>
+					-->
+					<option value="South-Eastern Asia">&middot; South-Eastern Asia</option>
+					<option value="Southern Asia">&middot; Southern Asia</option>
+					<option value="Western Asia">&middot; Western Asia</option>
+					<option value="Europe">Europe</option>
+					<option value="Eastern Europe">&middot; Eastern Europe</option>
+					<option value="Northern Europe">&middot; Northern Europe</option>
+					<option value="Southern Europe">&middot; Southern Europe</option>
+					<option value="Western Europe">&middot; Western Europe</option>
+					<option value="Oceania">Oceania</option>
+					<option value="Australia and New Zealand">&middot; Australia and New Zealand</option>
+					<option value="Melanesia">&middot; Melanesia</option>
+					<option value="Micronesia">&middot; Micronesia</option>
+					<option value="Polynesia">&middot; Polynesia</option>
+					<!-- - countries -->
+					<option value="Afghanistan" style="display:none;">&middot; &middot; Afghanistan</option>
+					<option value="Albania" style="display:none;">&middot; &middot; Albania</option>
+					<option value="Algeria" style="display:none;">&middot; &middot; Algeria</option>
+					<option value="American Samoa" style="display:none;">&middot; &middot; American Samoa</option>
+					<option value="Andorra" style="display:none;">&middot; &middot; Andorra</option>
+					<option value="Angola" style="display:none;">&middot; &middot; Angola</option>
+					<option value="Anguilla" style="display:none;">&middot; &middot; Anguilla</option>
+					<option value="Antigua and Barbuda" style="display:none;">&middot; &middot; Antigua and Barbuda</option>
+					<option value="Argentina" style="display:none;">&middot; &middot; Argentina</option>
+					<option value="Armenia" style="display:none;">&middot; &middot; Armenia</option>
+					<option value="Aruba" style="display:none;">&middot; &middot; Aruba</option>
+					<option value="Australia" style="display:none;">&middot; &middot; Australia</option>
+					<option value="Austria" style="display:none;">&middot; &middot; Austria</option>
+					<option value="Azerbaijan" style="display:none;">&middot; &middot; Azerbaijan</option>
+					<option value="Bahamas" style="display:none;">&middot; &middot; Bahamas</option>
+					<option value="Bahrain" style="display:none;">&middot; &middot; Bahrain</option>
+					<option value="Bangladesh" style="display:none;">&middot; &middot; Bangladesh</option>
+					<option value="Barbados" style="display:none;">&middot; &middot; Barbados</option>
+					<option value="Belarus" style="display:none;">&middot; &middot; Belarus</option>
+					<option value="Belgium" style="display:none;">&middot; &middot; Belgium</option>
+					<option value="Belize" style="display:none;">&middot; &middot; Belize</option>
+					<option value="Benin" style="display:none;">&middot; &middot; Benin</option>
+					<option value="Bermuda" style="display:none;">&middot; &middot; Bermuda</option>
+					<option value="Bhutan" style="display:none;">&middot; &middot; Bhutan</option>
+					<option value="Bolivia" style="display:none;">&middot; &middot; Bolivia</option>
+					<option value="Bosnia and Herzegovina" style="display:none;">&middot; &middot; Bosnia and Herzegovina</option>
+					<option value="Botswana" style="display:none;">&middot; &middot; Botswana</option>
+					<option value="Brazil" style="display:none;">&middot; &middot; Brazil</option>
+					<option value="British Virgin Islands" style="display:none;">&middot; &middot; British Virgin Islands</option>
+					<option value="Brunei Darussalam" style="display:none;">&middot; &middot; Brunei Darussalam</option>
+					<option value="Bulgaria" style="display:none;">&middot; &middot; Bulgaria</option>
+					<option value="Burkina Faso" style="display:none;">&middot; &middot; Burkina Faso</option>
+					<option value="Burundi" style="display:none;">&middot; &middot; Burundi</option>
+					<option value="Cabo Verde" style="display:none;">&middot; &middot; Cabo Verde</option>
+					<option value="Cambodia" style="display:none;">&middot; &middot; Cambodia</option>
+					<option value="Cameroon" style="display:none;">&middot; &middot; Cameroon</option>
+					<option value="Canada" style="display:none;">&middot; &middot; Canada</option>
+					<option value="Cayman Islands" style="display:none;">&middot; &middot; Cayman Islands</option>
+					<option value="Central African Republic" style="display:none;">&middot; &middot; Central African Republic</option>
+					<option value="Chad" style="display:none;">&middot; &middot; Chad</option>
+					<option value="Chile" style="display:none;">&middot; &middot; Chile</option>
+					<option value="China" style="display:none;">&middot; &middot; China</option>
+					<option value="China Hong Kong SAR" style="display:none;">&middot; &middot; China Hong Kong SAR</option>
+					<option value="China Macao SAR" style="display:none;">&middot; &middot; China Macao SAR</option>
+					<option value="Colombia" style="display:none;">&middot; &middot; Colombia</option>
+					<option value="Comoros" style="display:none;">&middot; &middot; Comoros</option>
+					<option value="Congo" style="display:none;">&middot; &middot; Congo</option>
+					<option value="Cook Islands" style="display:none;">&middot; &middot; Cook Islands</option>
+					<option value="Costa Rica" style="display:none;">&middot; &middot; Costa Rica</option>
+					<option value="Cote dIvoire" style="display:none;">&middot; &middot; Cote dIvoire</option>
+					<option value="Croatia" style="display:none;">&middot; &middot; Croatia</option>
+					<option value="Cuba" style="display:none;">&middot; &middot; Cuba</option>
+					<option value="Cyprus" style="display:none;">&middot; &middot; Cyprus</option>
+					<option value="Czech Republic" style="display:none;">&middot; &middot; Czech Republic</option>
+					<option value="Denmark" style="display:none;">&middot; &middot; Denmark</option>
+					<option value="Djibouti" style="display:none;">&middot; &middot; Djibouti</option>
+					<option value="Dominica" style="display:none;">&middot; &middot; Dominica</option>
+					<option value="Dominican Republic" style="display:none;">&middot; &middot; Dominican Republic</option>
+					<option value="Ecuador" style="display:none;">&middot; &middot; Ecuador</option>
+					<option value="Egypt" style="display:none;">&middot; &middot; Egypt</option>
+					<option value="El Salvador" style="display:none;">&middot; &middot; El Salvador</option>
+					<option value="Equatorial Guinea" style="display:none;">&middot; &middot; Equatorial Guinea</option>
+					<option value="Eritrea" style="display:none;">&middot; &middot; Eritrea</option>
+					<option value="Estonia" style="display:none;">&middot; &middot; Estonia</option>
+					<option value="Ethiopia" style="display:none;">&middot; &middot; Ethiopia</option>
+					<option value="Faeroe Islands" style="display:none;">&middot; &middot; Faeroe Islands</option>
+					<option value="Falkland Islands" style="display:none;">&middot; &middot; Falkland Islands</option>
+					<option value="Fiji" style="display:none;">&middot; &middot; Fiji</option>
+					<option value="Finland" style="display:none;">&middot; &middot; Finland</option>
+					<option value="France" style="display:none;">&middot; &middot; France</option>
+					<option value="French Guiana" style="display:none;">&middot; &middot; French Guiana</option>
+					<option value="French Polynesia" style="display:none;">&middot; &middot; French Polynesia</option>
+					<option value="Gabon" style="display:none;">&middot; &middot; Gabon</option>
+					<option value="Gambia" style="display:none;">&middot; &middot; Gambia</option>
+					<option value="Georgia" style="display:none;">&middot; &middot; Georgia</option>
+					<option value="Germany" style="display:none;">&middot; &middot; Germany</option>
+					<option value="Ghana" style="display:none;">&middot; &middot; Ghana</option>
+					<option value="Gibraltar" style="display:none;">&middot; &middot; Gibraltar</option>
+					<option value="Greece" style="display:none;">&middot; &middot; Greece</option>
+					<option value="Greenland" style="display:none;">&middot; &middot; Greenland</option>
+					<option value="Grenada" style="display:none;">&middot; &middot; Grenada</option>
+					<option value="Guadeloupe" style="display:none;">&middot; &middot; Guadeloupe</option>
+					<option value="Guam" style="display:none;">&middot; &middot; Guam</option>
+					<option value="Guatemala" style="display:none;">&middot; &middot; Guatemala</option>
+					<option value="Guernsey" style="display:none;">&middot; &middot; Guernsey</option>
+					<option value="Guinea" style="display:none;">&middot; &middot; Guinea</option>
+					<option value="Guinea Bissau" style="display:none;">&middot; &middot; Guinea Bissau</option>
+					<option value="Guyana" style="display:none;">&middot; &middot; Guyana</option>
+					<option value="Haiti" style="display:none;">&middot; &middot; Haiti</option>
+					<option value="Honduras" style="display:none;">&middot; &middot; Honduras</option>
+					<option value="Hungary" style="display:none;">&middot; &middot; Hungary</option>
+					<option value="Iceland" style="display:none;">&middot; &middot; Iceland</option>
+					<option value="India" style="display:none;">&middot; &middot; India</option>
+					<option value="Indonesia" style="display:none;">&middot; &middot; Indonesia</option>
+					<option value="Iran" style="display:none;">&middot; &middot; Iran</option>
+					<option value="Iraq" style="display:none;">&middot; &middot; Iraq</option>
+					<option value="Ireland" style="display:none;">&middot; &middot; Ireland</option>
+					<option value="Isle of Man" style="display:none;">&middot; &middot; Isle of Man</option>
+					<option value="Israel" style="display:none;">&middot; &middot; Israel</option>
+					<option value="Italy" style="display:none;">&middot; &middot; Italy</option>
+					<option value="Jamaica" style="display:none;">&middot; &middot; Jamaica</option>
+					<option value="Japan" style="display:none;">&middot; &middot; Japan</option>
+					<option value="Jersey" style="display:none;">&middot; &middot; Jersey</option>
+					<option value="Jordan" style="display:none;">&middot; &middot; Jordan</option>
+					<option value="Kazakhstan" style="display:none;">&middot; &middot; Kazakhstan</option>
+					<option value="Kenya" style="display:none;">&middot; &middot; Kenya</option>
+					<option value="Kiribati" style="display:none;">&middot; &middot; Kiribati</option>
+					<option value="Korea North" style="display:none;">&middot; &middot; Korea North</option>
+					<option value="Korea South" style="display:none;">&middot; &middot; Korea South</option>
+					<option value="Kuwait" style="display:none;">&middot; &middot; Kuwait</option>
+					<option value="Kyrgyzstan" style="display:none;">&middot; &middot; Kyrgyzstan</option>
+					<option value="Lao" style="display:none;">&middot; &middot; Lao</option>
+					<option value="Latvia" style="display:none;">&middot; &middot; Latvia</option>
+					<option value="Lebanon" style="display:none;">&middot; &middot; Lebanon</option>
+					<option value="Lesotho" style="display:none;">&middot; &middot; Lesotho</option>
+					<option value="Liberia" style="display:none;">&middot; &middot; Liberia</option>
+					<option value="Libya" style="display:none;">&middot; &middot; Libya</option>
+					<option value="Liechtenstein" style="display:none;">&middot; &middot; Liechtenstein</option>
+					<option value="Lithuania" style="display:none;">&middot; &middot; Lithuania</option>
+					<option value="Luxembourg" style="display:none;">&middot; &middot; Luxembourg</option>
+					<option value="Macedonia FYR" style="display:none;">&middot; &middot; Macedonia FYR</option>
+					<option value="Madagascar" style="display:none;">&middot; &middot; Madagascar</option>
+					<option value="Malawi" style="display:none;">&middot; &middot; Malawi</option>
+					<option value="Malaysia" style="display:none;">&middot; &middot; Malaysia</option>
+					<option value="Maldives" style="display:none;">&middot; &middot; Maldives</option>
+					<option value="Mali" style="display:none;">&middot; &middot; Mali</option>
+					<option value="Malta" style="display:none;">&middot; &middot; Malta</option>
+					<option value="Marshall Islands" style="display:none;">&middot; &middot; Marshall Islands</option>
+					<option value="Martinique" style="display:none;">&middot; &middot; Martinique</option>
+					<option value="Mauritania" style="display:none;">&middot; &middot; Mauritania</option>
+					<option value="Mauritius" style="display:none;">&middot; &middot; Mauritius</option>
+					<option value="Mexico" style="display:none;">&middot; &middot; Mexico</option>
+					<option value="Micronesia" style="display:none;">&middot; &middot; Micronesia</option>
+					<option value="Mongolia" style="display:none;">&middot; &middot; Mongolia</option>
+					<option value="Montenegro" style="display:none;">&middot; &middot; Montenegro</option>
+					<option value="Montserrat" style="display:none;">&middot; &middot; Montserrat</option>
+					<option value="Morocco" style="display:none;">&middot; &middot; Morocco</option>
+					<option value="Mozambique" style="display:none;">&middot; &middot; Mozambique</option>
+					<option value="Myanmar" style="display:none;">&middot; &middot; Myanmar</option>
+					<option value="Namibia" style="display:none;">&middot; &middot; Namibia</option>
+					<option value="Nauru" style="display:none;">&middot; &middot; Nauru</option>
+					<option value="Nepal" style="display:none;">&middot; &middot; Nepal</option>
+					<option value="Netherlands" style="display:none;">&middot; &middot; Netherlands</option>
+					<option value="Netherlands Antilles" style="display:none;">&middot; &middot; Netherlands Antilles</option>
+					<option value="New Caledonia" style="display:none;">&middot; &middot; New Caledonia</option>
+					<option value="New Zealand" style="display:none;">&middot; &middot; New Zealand</option>
+					<option value="Nicaragua" style="display:none;">&middot; &middot; Nicaragua</option>
+					<option value="Niger" style="display:none;">&middot; &middot; Niger</option>
+					<option value="Nigeria" style="display:none;">&middot; &middot; Nigeria</option>
+					<option value="Niue" style="display:none;">&middot; &middot; Niue</option>
+					<option value="Northern Mariana Islands" style="display:none;">&middot; &middot; Northern Mariana Islands</option>
+					<option value="Norway" style="display:none;">&middot; &middot; Norway</option>
+					<option value="Oman" style="display:none;">&middot; &middot; Oman</option>
+					<option value="Pakistan" style="display:none;">&middot; &middot; Pakistan</option>
+					<option value="Palau" style="display:none;">&middot; &middot; Palau</option>
+					<option value="Panama" style="display:none;">&middot; &middot; Panama</option>
+					<option value="Papua New Guinea" style="display:none;">&middot; &middot; Papua New Guinea</option>
+					<option value="Paraguay" style="display:none;">&middot; &middot; Paraguay</option>
+					<option value="Peru" style="display:none;">&middot; &middot; Peru</option>
+					<option value="Philippines" style="display:none;">&middot; &middot; Philippines</option>
+					<option value="Poland" style="display:none;">&middot; &middot; Poland</option>
+					<option value="Portugal" style="display:none;">&middot; &middot; Portugal</option>
+					<option value="Puerto Rico" style="display:none;">&middot; &middot; Puerto Rico</option>
+					<option value="Qatar" style="display:none;">&middot; &middot; Qatar</option>
+					<option value="Republic of Moldova" style="display:none;">&middot; &middot; Republic of Moldova</option>
+					<option value="Reunion" style="display:none;">&middot; &middot; Reunion</option>
+					<option value="Romania" style="display:none;">&middot; &middot; Romania</option>
+					<option value="Russian Federation" style="display:none;">&middot; &middot; Russian Federation</option>
+					<option value="Rwanda" style="display:none;">&middot; &middot; Rwanda</option>
+					<option value="Samoa" style="display:none;">&middot; &middot; Samoa</option>
+					<option value="Sao Tome and Principe" style="display:none;">&middot; &middot; Sao Tome and Principe</option>
+					<option value="Saudi Arabia" style="display:none;">&middot; &middot; Saudi Arabia</option>
+					<option value="Senegal" style="display:none;">&middot; &middot; Senegal</option>
+					<option value="Serbia" style="display:none;">&middot; &middot; Serbia</option>
+					<option value="Seychelles" style="display:none;">&middot; &middot; Seychelles</option>
+					<option value="Sierra Leone" style="display:none;">&middot; &middot; Sierra Leone</option>
+					<option value="Singapore" style="display:none;">&middot; &middot; Singapore</option>
+					<option value="Slovakia" style="display:none;">&middot; &middot; Slovakia</option>
+					<option value="Slovenia" style="display:none;">&middot; &middot; Slovenia</option>
+					<option value="Solomon Islands" style="display:none;">&middot; &middot; Solomon Islands</option>
+					<option value="Somalia" style="display:none;">&middot; &middot; Somalia</option>
+					<option value="South Africa" style="display:none;">&middot; &middot; South Africa</option>
+					<option value="Spain" style="display:none;">&middot; &middot; Spain</option>
+					<option value="Sri Lanka" style="display:none;">&middot; &middot; Sri Lanka</option>
+					<option value="St Helena" style="display:none;">&middot; &middot; St Helena</option>
+					<option value="St Kitts Nevis" style="display:none;">&middot; &middot; St Kitts Nevis</option>
+					<option value="St Lucia" style="display:none;">&middot; &middot; St Lucia</option>
+					<option value="St Pierre Miquelon" style="display:none;">&middot; &middot; St Pierre Miquelon</option>
+					<option value="St Vincent Grenadines" style="display:none;">&middot; &middot; St Vincent Grenadines</option>
+					<option value="State of Palestine" style="display:none;">&middot; &middot; State of Palestine</option>
+					<option value="Sudan" style="display:none;">&middot; &middot; Sudan</option>
+					<option value="Suriname" style="display:none;">&middot; &middot; Suriname</option>
+					<option value="Swaziland" style="display:none;">&middot; &middot; Swaziland</option>
+					<option value="Sweden" style="display:none;">&middot; &middot; Sweden</option>
+					<option value="Switzerland" style="display:none;">&middot; &middot; Switzerland</option>
+					<option value="Syrian Arab Republic" style="display:none;">&middot; &middot; Syrian Arab Republic</option>
+					<option value="Tajikistan" style="display:none;">&middot; &middot; Tajikistan</option>
+					<option value="Tanzania" style="display:none;">&middot; &middot; Tanzania</option>
+					<option value="Thailand" style="display:none;">&middot; &middot; Thailand</option>
+					<option value="Timor Leste" style="display:none;">&middot; &middot; Timor Leste</option>
+					<option value="Togo" style="display:none;">&middot; &middot; Togo</option>
+					<option value="Tonga" style="display:none;">&middot; &middot; Tonga</option>
+					<option value="Trinidad and Tobago" style="display:none;">&middot; &middot; Trinidad and Tobago</option>
+					<option value="Tunisia" style="display:none;">&middot; &middot; Tunisia</option>
+					<option value="Turkey" style="display:none;">&middot; &middot; Turkey</option>
+					<option value="Turkmenistan" style="display:none;">&middot; &middot; Turkmenistan</option>
+					<option value="Turks and Caicos Islands" style="display:none;">&middot; &middot; Turks and Caicos Islands</option>
+					<option value="Tuvalu" style="display:none;">&middot; &middot; Tuvalu</option>
+					<option value="Uganda" style="display:none;">&middot; &middot; Uganda</option>
+					<option value="Ukraine" style="display:none;">&middot; &middot; Ukraine</option>
+					<option value="United Arab Emirates" style="display:none;">&middot; &middot; United Arab Emirates</option>
+					<option value="United Kingdom" style="display:none;">&middot; &middot; United Kingdom</option>
+					<option value="United States" style="display:none;">&middot; &middot; United States</option>
+					<option value="Uruguay" style="display:none;">&middot; &middot; Uruguay</option>
+					<option value="Uzbekistan" style="display:none;">&middot; &middot; Uzbekistan</option>
+					<option value="Vanuatu" style="display:none;">&middot; &middot; Vanuatu</option>
+					<option value="Venezuela" style="display:none;">&middot; &middot; Venezuela</option>
+					<option value="Viet Nam" style="display:none;">&middot; &middot; Viet Nam</option>
+					<option value="Virgin Islands" style="display:none;">&middot; &middot; Virgin Islands</option>
+					<option value="Wallis and Futuna Islands" style="display:none;">&middot; &middot; Wallis and Futuna Islands</option>
+					<option value="Yemen" style="display:none;">&middot; &middot; Yemen</option>
+					<option value="Zambia" style="display:none;">&middot; &middot; Zambia</option>
+					<option value="Zimbabwe" style="display:none;">&middot; &middot; Zimbabwe</option>
+					<option value="Afghanistan" style="display:none;">&middot; &middot; Afghanistan</option>
+					<option value="Albania" style="display:none;">&middot; &middot; Albania</option>
+					<option value="Algeria" style="display:none;">&middot; &middot; Algeria</option>
+					<option value="American Samoa" style="display:none;">&middot; &middot; American Samoa</option>
+					<option value="Andorra" style="display:none;">&middot; &middot; Andorra</option>
+					<option value="Angola" style="display:none;">&middot; &middot; Angola</option>
+					<option value="Anguilla" style="display:none;">&middot; &middot; Anguilla</option>
+					<option value="Antigua and Barbuda" style="display:none;">&middot; &middot; Antigua and Barbuda</option>
+					<option value="Argentina" style="display:none;">&middot; &middot; Argentina</option>
+					<option value="Armenia" style="display:none;">&middot; &middot; Armenia</option>
+					<option value="Aruba" style="display:none;">&middot; &middot; Aruba</option>
+					<option value="Australia" style="display:none;">&middot; &middot; Australia</option>
+					<option value="Austria" style="display:none;">&middot; &middot; Austria</option>
+					<option value="Azerbaijan" style="display:none;">&middot; &middot; Azerbaijan</option>
+					<option value="Bahamas" style="display:none;">&middot; &middot; Bahamas</option>
+					<option value="Bahrain" style="display:none;">&middot; &middot; Bahrain</option>
+					<option value="Bangladesh" style="display:none;">&middot; &middot; Bangladesh</option>
+					<option value="Barbados" style="display:none;">&middot; &middot; Barbados</option>
+					<option value="Belarus" style="display:none;">&middot; &middot; Belarus</option>
+					<option value="Belgium" style="display:none;">&middot; &middot; Belgium</option>
+					<option value="Belize" style="display:none;">&middot; &middot; Belize</option>
+					<option value="Benin" style="display:none;">&middot; &middot; Benin</option>
+					<option value="Bermuda" style="display:none;">&middot; &middot; Bermuda</option>
+					<option value="Bhutan" style="display:none;">&middot; &middot; Bhutan</option>
+					<option value="Bolivia" style="display:none;">&middot; &middot; Bolivia</option>
+					<option value="Bosnia and Herzegovina" style="display:none;">&middot; &middot; Bosnia and Herzegovina</option>
+					<option value="Botswana" style="display:none;">&middot; &middot; Botswana</option>
+					<option value="Brazil" style="display:none;">&middot; &middot; Brazil</option>
+					<option value="British Virgin Islands" style="display:none;">&middot; &middot; British Virgin Islands</option>
+					<option value="Brunei Darussalam" style="display:none;">&middot; &middot; Brunei Darussalam</option>
+					<option value="Bulgaria" style="display:none;">&middot; &middot; Bulgaria</option>
+					<option value="Burkina Faso" style="display:none;">&middot; &middot; Burkina Faso</option>
+					<option value="Burundi" style="display:none;">&middot; &middot; Burundi</option>
+					<option value="Cabo Verde" style="display:none;">&middot; &middot; Cabo Verde</option>
+					<option value="Cambodia" style="display:none;">&middot; &middot; Cambodia</option>
+					<option value="Cameroon" style="display:none;">&middot; &middot; Cameroon</option>
+					<option value="Canada" style="display:none;">&middot; &middot; Canada</option>
+					<option value="Cayman Islands" style="display:none;">&middot; &middot; Cayman Islands</option>
+					<option value="Central African Republic" style="display:none;">&middot; &middot; Central African Republic</option>
+					<option value="Chad" style="display:none;">&middot; &middot; Chad</option>
+					<option value="Chile" style="display:none;">&middot; &middot; Chile</option>
+					<option value="China" style="display:none;">&middot; &middot; China</option>
+					<option value="China Hong Kong SAR" style="display:none;">&middot; &middot; China Hong Kong SAR</option>
+					<option value="China Macao SAR" style="display:none;">&middot; &middot; China Macao SAR</option>
+					<option value="Colombia" style="display:none;">&middot; &middot; Colombia</option>
+					<option value="Comoros" style="display:none;">&middot; &middot; Comoros</option>
+					<option value="Congo" style="display:none;">&middot; &middot; Congo</option>
+					<option value="Cook Islands" style="display:none;">&middot; &middot; Cook Islands</option>
+					<option value="Costa Rica" style="display:none;">&middot; &middot; Costa Rica</option>
+					<option value="Cote dIvoire" style="display:none;">&middot; &middot; Cote dIvoire</option>
+					<option value="Croatia" style="display:none;">&middot; &middot; Croatia</option>
+					<option value="Cuba" style="display:none;">&middot; &middot; Cuba</option>
+					<option value="Cyprus" style="display:none;">&middot; &middot; Cyprus</option>
+					<option value="Czech Republic" style="display:none;">&middot; &middot; Czech Republic</option>
+					<option value="Denmark" style="display:none;">&middot; &middot; Denmark</option>
+					<option value="Djibouti" style="display:none;">&middot; &middot; Djibouti</option>
+					<option value="Dominica" style="display:none;">&middot; &middot; Dominica</option>
+					<option value="Dominican Republic" style="display:none;">&middot; &middot; Dominican Republic</option>
+					<option value="Ecuador" style="display:none;">&middot; &middot; Ecuador</option>
+					<option value="Egypt" style="display:none;">&middot; &middot; Egypt</option>
+					<option value="El Salvador" style="display:none;">&middot; &middot; El Salvador</option>
+					<option value="Equatorial Guinea" style="display:none;">&middot; &middot; Equatorial Guinea</option>
+					<option value="Eritrea" style="display:none;">&middot; &middot; Eritrea</option>
+					<option value="Estonia" style="display:none;">&middot; &middot; Estonia</option>
+					<option value="Ethiopia" style="display:none;">&middot; &middot; Ethiopia</option>
+					<option value="Faeroe Islands" style="display:none;">&middot; &middot; Faeroe Islands</option>
+					<option value="Falkland Islands" style="display:none;">&middot; &middot; Falkland Islands</option>
+					<option value="Fiji" style="display:none;">&middot; &middot; Fiji</option>
+					<option value="Finland" style="display:none;">&middot; &middot; Finland</option>
+					<option value="France" style="display:none;">&middot; &middot; France</option>
+					<option value="French Guiana" style="display:none;">&middot; &middot; French Guiana</option>
+					<option value="French Polynesia" style="display:none;">&middot; &middot; French Polynesia</option>
+					<option value="Gabon" style="display:none;">&middot; &middot; Gabon</option>
+					<option value="Gambia" style="display:none;">&middot; &middot; Gambia</option>
+					<option value="Georgia" style="display:none;">&middot; &middot; Georgia</option>
+					<option value="Germany" style="display:none;">&middot; &middot; Germany</option>
+					<option value="Ghana" style="display:none;">&middot; &middot; Ghana</option>
+					<option value="Gibraltar" style="display:none;">&middot; &middot; Gibraltar</option>
+					<option value="Greece" style="display:none;">&middot; &middot; Greece</option>
+					<option value="Greenland" style="display:none;">&middot; &middot; Greenland</option>
+					<option value="Grenada" style="display:none;">&middot; &middot; Grenada</option>
+					<option value="Guadeloupe" style="display:none;">&middot; &middot; Guadeloupe</option>
+					<option value="Guam" style="display:none;">&middot; &middot; Guam</option>
+					<option value="Guatemala" style="display:none;">&middot; &middot; Guatemala</option>
+					<option value="Guernsey" style="display:none;">&middot; &middot; Guernsey</option>
+					<option value="Guinea" style="display:none;">&middot; &middot; Guinea</option>
+					<option value="Guinea Bissau" style="display:none;">&middot; &middot; Guinea Bissau</option>
+					<option value="Guyana" style="display:none;">&middot; &middot; Guyana</option>
+					<option value="Haiti" style="display:none;">&middot; &middot; Haiti</option>
+					<option value="Honduras" style="display:none;">&middot; &middot; Honduras</option>
+					<option value="Hungary" style="display:none;">&middot; &middot; Hungary</option>
+					<option value="Iceland" style="display:none;">&middot; &middot; Iceland</option>
+					<option value="India" style="display:none;">&middot; &middot; India</option>
+					<option value="Indonesia" style="display:none;">&middot; &middot; Indonesia</option>
+					<option value="Iran" style="display:none;">&middot; &middot; Iran</option>
+					<option value="Iraq" style="display:none;">&middot; &middot; Iraq</option>
+					<option value="Ireland" style="display:none;">&middot; &middot; Ireland</option>
+					<option value="Isle of Man" style="display:none;">&middot; &middot; Isle of Man</option>
+					<option value="Israel" style="display:none;">&middot; &middot; Israel</option>
+					<option value="Italy" style="display:none;">&middot; &middot; Italy</option>
+					<option value="Jamaica" style="display:none;">&middot; &middot; Jamaica</option>
+					<option value="Japan" style="display:none;">&middot; &middot; Japan</option>
+					<option value="Jersey" style="display:none;">&middot; &middot; Jersey</option>
+					<option value="Jordan" style="display:none;">&middot; &middot; Jordan</option>
+					<option value="Kazakhstan" style="display:none;">&middot; &middot; Kazakhstan</option>
+					<option value="Kenya" style="display:none;">&middot; &middot; Kenya</option>
+					<option value="Kiribati" style="display:none;">&middot; &middot; Kiribati</option>
+					<option value="Korea North" style="display:none;">&middot; &middot; Korea North</option>
+					<option value="Korea South" style="display:none;">&middot; &middot; Korea South</option>
+					<option value="Kuwait" style="display:none;">&middot; &middot; Kuwait</option>
+					<option value="Kyrgyzstan" style="display:none;">&middot; &middot; Kyrgyzstan</option>
+					<option value="Lao" style="display:none;">&middot; &middot; Lao</option>
+					<option value="Latvia" style="display:none;">&middot; &middot; Latvia</option>
+					<option value="Lebanon" style="display:none;">&middot; &middot; Lebanon</option>
+					<option value="Lesotho" style="display:none;">&middot; &middot; Lesotho</option>
+					<option value="Liberia" style="display:none;">&middot; &middot; Liberia</option>
+					<option value="Libya" style="display:none;">&middot; &middot; Libya</option>
+					<option value="Liechtenstein" style="display:none;">&middot; &middot; Liechtenstein</option>
+					<option value="Lithuania" style="display:none;">&middot; &middot; Lithuania</option>
+					<option value="Luxembourg" style="display:none;">&middot; &middot; Luxembourg</option>
+					<option value="Macedonia FYR" style="display:none;">&middot; &middot; Macedonia FYR</option>
+					<option value="Madagascar" style="display:none;">&middot; &middot; Madagascar</option>
+					<option value="Malawi" style="display:none;">&middot; &middot; Malawi</option>
+					<option value="Malaysia" style="display:none;">&middot; &middot; Malaysia</option>
+					<option value="Maldives" style="display:none;">&middot; &middot; Maldives</option>
+					<option value="Mali" style="display:none;">&middot; &middot; Mali</option>
+					<option value="Malta" style="display:none;">&middot; &middot; Malta</option>
+					<option value="Marshall Islands" style="display:none;">&middot; &middot; Marshall Islands</option>
+					<option value="Martinique" style="display:none;">&middot; &middot; Martinique</option>
+					<option value="Mauritania" style="display:none;">&middot; &middot; Mauritania</option>
+					<option value="Mauritius" style="display:none;">&middot; &middot; Mauritius</option>
+					<option value="Mexico" style="display:none;">&middot; &middot; Mexico</option>
+					<option value="Micronesia" style="display:none;">&middot; &middot; Micronesia</option>
+					<option value="Mongolia" style="display:none;">&middot; &middot; Mongolia</option>
+					<option value="Montenegro" style="display:none;">&middot; &middot; Montenegro</option>
+					<option value="Montserrat" style="display:none;">&middot; &middot; Montserrat</option>
+					<option value="Morocco" style="display:none;">&middot; &middot; Morocco</option>
+					<option value="Mozambique" style="display:none;">&middot; &middot; Mozambique</option>
+					<option value="Myanmar" style="display:none;">&middot; &middot; Myanmar</option>
+					<option value="Namibia" style="display:none;">&middot; &middot; Namibia</option>
+					<option value="Nauru" style="display:none;">&middot; &middot; Nauru</option>
+					<option value="Nepal" style="display:none;">&middot; &middot; Nepal</option>
+					<option value="Netherlands" style="display:none;">&middot; &middot; Netherlands</option>
+					<option value="Netherlands Antilles" style="display:none;">&middot; &middot; Netherlands Antilles</option>
+					<option value="New Caledonia" style="display:none;">&middot; &middot; New Caledonia</option>
+					<option value="New Zealand" style="display:none;">&middot; &middot; New Zealand</option>
+					<option value="Nicaragua" style="display:none;">&middot; &middot; Nicaragua</option>
+					<option value="Niger" style="display:none;">&middot; &middot; Niger</option>
+					<option value="Nigeria" style="display:none;">&middot; &middot; Nigeria</option>
+					<option value="Niue" style="display:none;">&middot; &middot; Niue</option>
+					<option value="Northern Mariana Islands" style="display:none;">&middot; &middot; Northern Mariana Islands</option>
+					<option value="Norway" style="display:none;">&middot; &middot; Norway</option>
+					<option value="Oman" style="display:none;">&middot; &middot; Oman</option>
+					<option value="Pakistan" style="display:none;">&middot; &middot; Pakistan</option>
+					<option value="Palau" style="display:none;">&middot; &middot; Palau</option>
+					<option value="Panama" style="display:none;">&middot; &middot; Panama</option>
+					<option value="Papua New Guinea" style="display:none;">&middot; &middot; Papua New Guinea</option>
+					<option value="Paraguay" style="display:none;">&middot; &middot; Paraguay</option>
+					<option value="Peru" style="display:none;">&middot; &middot; Peru</option>
+					<option value="Philippines" style="display:none;">&middot; &middot; Philippines</option>
+					<option value="Poland" style="display:none;">&middot; &middot; Poland</option>
+					<option value="Portugal" style="display:none;">&middot; &middot; Portugal</option>
+					<option value="Puerto Rico" style="display:none;">&middot; &middot; Puerto Rico</option>
+					<option value="Qatar" style="display:none;">&middot; &middot; Qatar</option>
+					<option value="Republic of Moldova" style="display:none;">&middot; &middot; Republic of Moldova</option>
+					<option value="Reunion" style="display:none;">&middot; &middot; Reunion</option>
+					<option value="Romania" style="display:none;">&middot; &middot; Romania</option>
+					<option value="Russian Federation" style="display:none;">&middot; &middot; Russian Federation</option>
+					<option value="Rwanda" style="display:none;">&middot; &middot; Rwanda</option>
+					<option value="Samoa" style="display:none;">&middot; &middot; Samoa</option>
+					<option value="Sao Tome and Principe" style="display:none;">&middot; &middot; Sao Tome and Principe</option>
+					<option value="Saudi Arabia" style="display:none;">&middot; &middot; Saudi Arabia</option>
+					<option value="Senegal" style="display:none;">&middot; &middot; Senegal</option>
+					<option value="Serbia" style="display:none;">&middot; &middot; Serbia</option>
+					<option value="Seychelles" style="display:none;">&middot; &middot; Seychelles</option>
+					<option value="Sierra Leone" style="display:none;">&middot; &middot; Sierra Leone</option>
+					<option value="Singapore" style="display:none;">&middot; &middot; Singapore</option>
+					<option value="Slovakia" style="display:none;">&middot; &middot; Slovakia</option>
+					<option value="Slovenia" style="display:none;">&middot; &middot; Slovenia</option>
+					<option value="Solomon Islands" style="display:none;">&middot; &middot; Solomon Islands</option>
+					<option value="Somalia" style="display:none;">&middot; &middot; Somalia</option>
+					<option value="South Africa" style="display:none;">&middot; &middot; South Africa</option>
+					<option value="Spain" style="display:none;">&middot; &middot; Spain</option>
+					<option value="Sri Lanka" style="display:none;">&middot; &middot; Sri Lanka</option>
+					<option value="St Helena" style="display:none;">&middot; &middot; St Helena</option>
+					<option value="St Kitts Nevis" style="display:none;">&middot; &middot; St Kitts Nevis</option>
+					<option value="St Lucia" style="display:none;">&middot; &middot; St Lucia</option>
+					<option value="St Pierre Miquelon" style="display:none;">&middot; &middot; St Pierre Miquelon</option>
+					<option value="St Vincent Grenadines" style="display:none;">&middot; &middot; St Vincent Grenadines</option>
+					<option value="State of Palestine" style="display:none;">&middot; &middot; State of Palestine</option>
+					<option value="Sudan" style="display:none;">&middot; &middot; Sudan</option>
+					<option value="Suriname" style="display:none;">&middot; &middot; Suriname</option>
+					<option value="Swaziland" style="display:none;">&middot; &middot; Swaziland</option>
+					<option value="Sweden" style="display:none;">&middot; &middot; Sweden</option>
+					<option value="Switzerland" style="display:none;">&middot; &middot; Switzerland</option>
+					<option value="Syrian Arab Republic" style="display:none;">&middot; &middot; Syrian Arab Republic</option>
+					<option value="Tajikistan" style="display:none;">&middot; &middot; Tajikistan</option>
+					<option value="Tanzania" style="display:none;">&middot; &middot; Tanzania</option>
+					<option value="Thailand" style="display:none;">&middot; &middot; Thailand</option>
+					<option value="Timor Leste" style="display:none;">&middot; &middot; Timor Leste</option>
+					<option value="Togo" style="display:none;">&middot; &middot; Togo</option>
+					<option value="Tonga" style="display:none;">&middot; &middot; Tonga</option>
+					<option value="Trinidad and Tobago" style="display:none;">&middot; &middot; Trinidad and Tobago</option>
+					<option value="Tunisia" style="display:none;">&middot; &middot; Tunisia</option>
+					<option value="Turkey" style="display:none;">&middot; &middot; Turkey</option>
+					<option value="Turkmenistan" style="display:none;">&middot; &middot; Turkmenistan</option>
+					<option value="Turks and Caicos Islands" style="display:none;">&middot; &middot; Turks and Caicos Islands</option>
+					<option value="Tuvalu" style="display:none;">&middot; &middot; Tuvalu</option>
+					<option value="Uganda" style="display:none;">&middot; &middot; Uganda</option>
+					<option value="Ukraine" style="display:none;">&middot; &middot; Ukraine</option>
+					<option value="United Arab Emirates" style="display:none;">&middot; &middot; United Arab Emirates</option>
+					<option value="United Kingdom" style="display:none;">&middot; &middot; United Kingdom</option>
+					<option value="United States" style="display:none;">&middot; &middot; United States</option>
+					<option value="Uruguay" style="display:none;">&middot; &middot; Uruguay</option>
+					<option value="Uzbekistan" style="display:none;">&middot; &middot; Uzbekistan</option>
+					<option value="Vanuatu" style="display:none;">&middot; &middot; Vanuatu</option>
+					<option value="Venezuela" style="display:none;">&middot; &middot; Venezuela</option>
+					<option value="Viet Nam" style="display:none;">&middot; &middot; Viet Nam</option>
+					<option value="Virgin Islands" style="display:none;">&middot; &middot; Virgin Islands</option>
+					<option value="Wallis and Futuna Islands" style="display:none;">&middot; &middot; Wallis and Futuna Islands</option>
+					<option value="Yemen" style="display:none;">&middot; &middot; Yemen</option>
+					<option value="Zambia" style="display:none;">&middot; &middot; Zambia</option>
+					<option value="Zimbabwe" style="display:none;">&middot; &middot; Zimbabwe</option>
+				</select>
+			</span>
+			</div>
+			<div class="col-lg-3">
+			<span>
+				<span class="selectTitle inlineBlock" >Year</span><br>
+				<select name="year" id="year" onchange="updatedata(true)" class="selectpicker">
+					<option value="1990">1990</option>
+					<option value="1991">1991</option>
+					<option value="1992">1992</option>
+					<option value="1993">1993</option>
+					<option value="1994">1994</option>
+					<option value="1995">1995</option>
+					<option value="1996">1996</option>
+					<option value="1997">1997</option>
+					<option value="1998">1998</option>
+					<option value="1999">1999</option>
+					<option value="2000">2000</option>
+					<option value="2001">2001</option>
+					<option value="2002">2002</option>
+					<option value="2003">2003</option>
+					<option value="2004">2004</option>
+					<option value="2005">2005</option>
+					<option value="2006">2006</option>
+					<option value="2007" selected>2007</option>
+					<option value="2008">2008</option>
+					<option value="2009">2009</option>
+					<option value="2010">2010</option>
+					<option value="2011">2011</option>
+					<option value="2012">2012</option>
+					
+				</select>
+			<br>
+			</span>
+			</div>
+			<div class="col-lg-3">
+			<span>
+				<span class="selectTitle inlineBlock" >Units</span><br>
+				<select id="units" onchange="updatedata()" class="selectpicker">
+					<option value="absolute" selected="selected">Absolute</option>
+					<option value="percap">Per Capita</option>
+				</select>
+			</span>
+			</div>
+			<div class="col-lg-3">
+			<span>
+				<span class="selectTitle inlineBlock" >Outermost Category</span><br>
+				<select id="hierarchy" onchange="updatedata()" class="selectpicker">
+					<option value="energy">Regions</option>
+					<option value="region" selected>Energy Class</option>
+				</select>
+			</span>
+			</div>
+			<br />
+			<hr />
+		 </div>
+		</div>
+		
+		<!-- headings/titles -->		
+		<div >
+		  <div >
+			<div class = "text-left inlineBlock" style="width: 550px;" >
+				<h5 style=" margin-bottom: 5px;">Production Inflows <br>by Region and Type of Production</h5>
+			</div>
+			<div style="width: 300px;" class = "text-center inlineBlock">
+				<h4 style=" margin-bottom: 5px;" id="wheel-title"></h4>
+				<h5 style=" margin-bottom: 5px;">Total Electricity <br>Produced and Consumed</h5>
+			</div>
+			<div style="width: 550px;" class = "text-right inlineBlock">
+				<h5 style=" margin-bottom: 5px;">Consumption Outflows<br>by Region and Final Type of User</h5>
+			</div>
+		  </div>
+		</div>
+		
+		
+		<div class="chart">
+			<span class="chart inlineBlock" id="sankeyleft"></span>
+			<span class="chart inlineBlock" id="center_elements">
+				<div><button class="up-down" onclick="turnWheel(true);">&#9650 </button></div>
+				<div id="wheel"></div>
+				<div><button class="up-down" onclick="turnWheel(false);">&#9660 </button></div>
+			</span>
+			<span class="chart inlineBlock" id="sankeyright"></span>
+		</div>
+		
+		<div class="slider inlineBlock" id="slider" style="width: 1450px;"></div>
+		
+		<div class = "text-left inlineBlock" >
+			<h5 id="topfiveintro" style=" margin-bottom: 5px;"></h5>
+			<p></p>
+			<div>
+				<div class="topfive" id="topfive"></div>
+				<!--  <div class="bottomfive" id="bottomfive" ></div> -->
+		   </div>
+		</div>
+		
+		<!-- about code -->
+		<div id="about" class="container " style="margin-top: 50px; margin-bottom: 25px;">
+			<hr><h4>About This Visualization</h4>
+			<div class="row instructions text-to-columns text-left">
+
+				<p>This visualization is the final project submission for the class 'Data Visualization and Communication' of the MIDS program. 
+				</p>
+				<p>In this section, we describe in more detail how this visualization was made.</p>
+				
+				<p> <b>Data</b> &#8212 The data comes from the United Nations Annual Questionnaire on Energy Statistics. The country-specific data covers statistics on production, 
+				conversion and consumption of energy resources and products.
+				<br>Since our project focused on Electricity, we had to manually examine which fields were specifically related 
+				to electricity. With the relevant fields identified, we then organized and cleaned the data. The final dataset was stored as a 
+				JSON file to facilitate querying and communicating with the visualization. We used R and Python scripts to perform all the data cleaning tasks.
+				
+				</p><p>The data was downloaded on July of 2015 from the <a href="http://data.un.org/Explorer.aspx">UN Data Explorer</a> 
+				application.
+				</p>
+				
+				<p> <b>Design</b> &#8212 To come up with a design, we decided to worked separately on initial ideas so that each person's creative process would remain unbiased. 
+				We then presented our mock-ups to the group for discussion. From the set of initial ideas, 
+				we decided to implement the 'sankey design' because it was a good representation of the data, it was different from what we had seen before, and 
+				it had interesting interactivity associated with it.</p>
+				
+				<p><b>Implementation</b> &#8212 Like most visualization and website projects, we used a broad set of tools, including HTML, CSS, Javascript, JQuery, Bootstrap, and D3.js. 
+				We relied on GitHub to share and track our code, and also to host our site. 
+				</p><p>Collaboration was a key factor in our success as a team. Each one of us developed sections of the code corresponding to different components of the visualization. 
+				Constant communication allowed one person to adjust the data queries to ease and assist the visual work done by the rest of the group. When the separate components were complete, 
+				we worked on bringing them together, making them work as one, adding interactivity, and raising issues or errors that required fixing. 
+				
+				</p>
+			</div>
+		</div>
+	
+		<div class="container " style="margin-top: 50px; margin-bottom: 25px;">
+			<hr><h4>About Us</h4>
+			<div class="container">
+				<div class="row">
+					<div class="col-xs-6 col-sm-3 col-md-3">
+						<div class="wow bounceInUp" data-wow-delay="0.2s">
+							<div class="team boxed-grey">
+								<div class="inner">
+									<div class="avatar"><img src="img/team/1b.jpg" alt="" class="img-responsive img-circle" /></div>
+									<h5>Julian Phillips</h5>
+									<p class="subtitle">MIDS Student</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6 col-sm-3 col-md-3">
+						<div class="wow bounceInUp" data-wow-delay="0.5s">
+							<div class="team boxed-grey">
+								<div class="inner">
+									
+									<div class="avatar"><img src="img/team/2b.jpg" alt="" class="img-responsive img-circle" /></div>
+									<h5>Kasane Utsumi</h5>
+									<p class="subtitle">MIDS Student</p>
+
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6 col-sm-3 col-md-3">
+						<div class="wow bounceInUp" data-wow-delay="0.8s">
+							<div class="team boxed-grey">
+								<div class="inner">
+									<div class="avatar"><img src="img/team/3b.jpg" alt="" class="img-responsive img-circle" /></div>
+									<h5>David Rose</h5>
+									<p class="subtitle">MIDS Student</p>
+
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6 col-sm-3 col-md-3">
+						<div class="wow bounceInUp" data-wow-delay="1s">
+							<div class="team boxed-grey">
+								<div class="inner">
+									<div class="avatar"><img src="img/team/4b.jpg" alt="" class="img-responsive img-circle" /></div>
+									<h5>Andrea Soto</h5>
+									<p class="subtitle">MIDS Student</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	
+    <!-- Section: data -->
+	<!--
+    <section id="data" class="home-section">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-8 col-lg-offset-2">
+						<div class="wow bounceInDown" data-wow-delay="0.4s">
+							<div class="section-heading text-center">
+								<h2>About This Visualization</h2>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="container">
+               <div class="row " >
+				<div class="col-lg-4">
+					<div class="wow fadeInLeft" data-wow-delay="0.2s">
+						<div class="data-box">
+								<h4>Data</h4>
+								<p>The data comes from the United Nations Energy Statistics Database. The data is
+								publicly available and can be downloaded <a href="http://data.un.org/Explorer.aspx">here</a>.
+								 </p>
+								<p>We used R and Python to clean the data and put it into JSON format.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="wow fadeInUp" data-wow-delay="0.2s">
+						<div class="data-box">
+								<h4>Design</h4>
+								<p>We worked separately on possible designs to generate different ideas. From the set of initial options 
+								we decided to implement the sankey design because it would represent the data appropriately and was 
+								different from what we had seen before.
+								</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-4">
+					<div class="wow fadeInUp" data-wow-delay="0.2s">
+						<div class="data-box">
+								<h4 >Implementation</h4>
+								<p>We used variety of tools to create the visualization, including Javascript, JQuery, Bootstrap, and D3.js. 
+								</p><p>The visualization has different components so we 
+								distributed the work between us. When each part was completed, we brought all the parts together and focused 
+							    on making them work as one, adding interactivity and making any required changes. 
+								</p><p>Collaboration was a key factor in our success as a team. 
+								</p>
+						</div>
+					</div>
+				</div>
+			   </div>   
+            </div>
+    </section><hr>
+	-->
+	
+	<!-- Section: about -->
+
+	</section><hr>
+	
+	
+    <!-- JavaScript libraries -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/d3.min.js" charset="utf-8"></script>
+    <script src="js/bootstrap.min.js"></script>
+	
+    <!-- Data Queries -->
+    <script src="data/electricity_codes.js"></script>
+    <script src="data/electricity.js"></script>
+    <!-- Year Slider -->
+    <script src="js/d3.slider.js"></script>
+    <!-- Bar charts -->
+    <script src="js/wheel_2.js"></script>
+    <script src="js/topfive.js"></script>
+    <!-- Sankeys -->
+    <script src="js/sankey.js"></script>
+    <script src="js/sankeydisplay.js"></script>
+    <!--<script src="bootstrap/js/bootstrap.min.js"></script>-->
+    <script src="js/bootstrap-select.js"></script>
+
+
+    <!-- Custom Theme JavaScript -->
+    <script src="js/custom.js"></script>
+
+</section>
+
+    <script>
+        var data = {};
+        var slider = null;
+
+        // Set size of visualization globally
+        var wheel_width = 300,
+            sank_width = 550,
+            wheel_height = 450,
+            sank_height = wheel_height + 21 + 21; //21 is the height of the div with buttons
+
+        //window.onload = function () { data = loaddata(); initWheel(); initslider(); updatedata(); }
+
+        function setupDropDown() {
+            $('region').dropdown()
+        }
+		
+        function initWheel() {
+
+            var region = document.getElementById("region").value;
+            var year = document.getElementById("year").value;
+            var valuetype = document.getElementById("units").value;
+
+            setCenterIndex(year);
+            var wheeldata = getwheeldata(region, year, valuetype, -1);
+            drawwheel(wheeldata, wheel_width, wheel_height);
+        }
+
+        function updatedata(turn) {
+            var region = document.getElementById("region").value;
+            var year = document.getElementById("year").value;
+            var valuetype = document.getElementById("units").value;
+            var hierarchy = document.getElementById("hierarchy").value;
+
+            // Update Wheel
+            if (typeof turn != "undefined") {
+                // If the change was the selected year, turn the wheel
+                turnToSelectedYear(year);
+            } else {
+                // If the change is something else, update the data and the wheel
+                var wheeldata = getwheeldata(region, year, valuetype, -1);
+                drawwheel(wheeldata, wheel_width, wheel_height);
+                updateSST();
+            }
+			//document.getElementById("wheel-title").innerHTML =  'Total Electricity <br>Produced and Consumed <br> in ' + region;
+			document.getElementById("wheel-title").innerHTML =  region;
+
+        }
+
+        function updateSST() {
+            // Update Sankey, Slider, and Top-5
+            var region = document.getElementById("region").value;
+            var year = document.getElementById("year").value;
+            var valuetype = document.getElementById("units").value;
+            var hierarchy = document.getElementById("hierarchy").value;
+
+            // Update left Sankey (Production)
+            var sankeyproddata = getsankeydata(region, year, valuetype, 'production', hierarchy, 'left');
+            var colorSchemes = displaysankey(sankeyproddata, '#sankeyleft', 'left', valuetype, sank_width, sank_height);
+
+            // Update Right Sankey (Consumption)
+            var sankeyconsdata = getsankeydata(region, year, valuetype, 'consumption', hierarchy, 'right');
+            displaysankey(sankeyconsdata, '#sankeyright', 'right', valuetype, sank_width, sank_height, colorSchemes);
+
+            // update and refresh the slider
+            self.slider.setValue(year);
+
+            // update the top five charts
+            // list of Top Five categories
+            var flowlist = ['Total Consumption', 'Total Production', 'Renewable', 'Nuclear', 'Combustion'];
+            var topfivedata = gettopfivedata(region, year, valuetype, flowlist, 'desc');
+            drawcharts(topfivedata, "#topfive");
+			if (getregion(region)=='World') {
+				document.getElementById("topfiveintro").innerHTML =  'Ranking &#8212 The 5 Countries in the ' + getregion(region) + ' with the highest...';
+			} else {
+				document.getElementById("topfiveintro").innerHTML =  'Ranking &#8212 The 5 Countries in ' + getregion(region) + ' with the highest...';
+			}
+            /*
+            var bottomfivedata = gettopfivedata(region, year, valuetype, flowlist, 'asc');
+            drawcharts(bottomfivedata, "#bottomfive");
+            */
+        }
+
+
+        function initslider() {
+            // construct a slider for the year parameter
+            slider = d3.slider()
+                       .min(1990)
+                       .max(2012)
+                       .tickValues([1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+                                    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+                                    2010, 2011, 2012])
+                       .tickFormat(function (d) { return d.toString(); })
+                       .stepValues([1990, 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+                                    2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
+                                    2010, 2011, 2012])
+                       .showRange(true)
+                       .value(2007)
+                       .callback(function (evt) {
+                           var cyear = document.getElementById("year").value;
+                           var newyear = self.slider.value();
+                           if (newyear != cyear) {
+                               document.getElementById("year").value = newyear;
+                               updatedata(true);
+                           }
+                       });
+
+            // Render the slider
+            d3.select('#slider').call(slider);
+        }
+        $(document).ready(function () {
+            data = loaddata(); initWheel(); initslider(); updatedata();
+            $('.selectpicker').selectpicker();
+        });
+
+    </script>
+
+
+</body>
+
+</html>

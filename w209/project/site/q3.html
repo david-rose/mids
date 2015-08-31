@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="./js/d3.min.js" charset="utf-8"></script>
+    <script src="./data/electricity_codes.js" ></script>
+    <script src="./data/electricity.js" ></script>
+    <meta charset="utf-8">
+    <title>Electricity Data Query Test</title>
+    <style>
+     body {
+       font: 11px sans-serif;
+     }
+     .code {
+       float: left;
+       width: 17%;
+       margin-left:0px;
+       margin-right:0px;
+       padding-left:0px;
+       padding-right:0px;
+       word-wrap: normal;
+     }
+     .codemiddle {
+       float: left;
+       width: 30%;
+       margin-left:0px;
+       margin-right:0px;
+       padding-left:0px;
+       padding-right:0px;
+       word-wrap: break-word;
+       border-left: thin solid #000000;
+       border-right: thin solid #000000;
+     }
+    </style>
+  </head>
+  <body>
+     <div class="options">
+    <span>Country/Region 
+      <select id="region" onChange="updatedata()" >
+        <option value="World" >World</option>
+        <option value="Africa" >Africa</option>
+        <option value="Eastern Africa" >&middot; Eastern Africa</option>
+        <option value="Middle Africa" >&middot; Middle Africa</option>
+        <option value="Northern Africa" >&middot; Northern Africa</option>
+        <option value="Southern Africa" >&middot; Southern Africa</option>
+        <option value="Western Africa" >&middot; Western Africa</option>
+        <option value="Americas" >Americas</option>
+        <option value="Caribbean" >&middot; Caribbean</option>
+        <option value="Central America" >&middot; Central America</option>
+        <option value="Northern America" >&middot; Northern America</option>
+        <option value="South America" >&middot; South America</option>
+        <option value="Asia" >Asia</option>
+        <option value="Central Asia" >&middot; Central Asia</option>
+        <option value="Eastern Asia" >&middot; Eastern Asia</option>
+        <option value="China">&middot; &middot; China</option>
+        <option value="Japan">&middot; &middot; Japan</option>
+        <option value="South-Eastern Asia" >&middot; South-Eastern Asia</option>
+        <option value="Southern Asia" >&middot; Southern Asia</option>
+        <option value="Western Asia" >&middot; Western Asia</option>
+        <option value="Europe" >Europe</option>
+        <option value="Eastern Europe" >&middot; Eastern Europe</option>
+        <option value="Northern Europe" >&middot; Northern Europe</option>
+        <option value="Southern Europe" >&middot; Southern Europe</option>
+        <option value="Western Europe" >&middot; Western Europe</option>
+        <option value="Oceania" >Oceania</option>
+        <option value="Australia and New Zealand" >&middot; Australia and New Zealand</option>
+        <option value="Melanesia" >&middot; Melanesia</option>
+        <option value="Micronesia" >&middot; Micronesia</option>
+        <option value="Polynesia" >&middot; Polynesia</option>
+      </select>
+    </span>
+    <span>Year
+      <select name="year" id="year" onChange="updatedata(true)"  >
+        <option value="1990">1990</option>
+        <option value="1991">1991</option>
+        <option value="1992">1992</option>
+        <option value="1993">1993</option>
+        <option value="1994">1994</option>
+        <option value="1995">1995</option>
+        <option value="1996">1996</option>
+        <option value="1997">1997</option>
+        <option value="1998">1998</option>
+        <option value="1999">1999</option>
+        <option value="2000">2000</option>
+        <option value="2001">2001</option>
+        <option value="2002">2002</option>
+        <option value="2003">2003</option>
+        <option value="2004">2004</option>
+        <option value="2005">2005</option>
+        <option value="2006">2006</option>
+        <option value="2007" selected>2007</option>
+        <option value="2008">2008</option>
+        <option value="2009">2009</option>
+        <option value="2010">2010</option>
+        <option value="2011">2011</option>
+        <option value="2012">2012</option>
+      </select>
+    </span>
+    <span>Units
+      <select id="units" onChange="updatedata()" >
+        <option value="absolute" selected="selected" >Absolute MkWh</option>
+        <option value="percap">Per Capita kWh</option>
+      </select>
+    </span>
+    <span>Hierarchy
+      <select id="hierarchy" onChange="updatedata()" >
+        <option value="region" >Region first -> then energy</option>
+        <option value="energy" selected >Energy first -> then region</option>
+      </select>
+    </span>
+    <br/>
+    <hr/>
+  </div>
+
+    <div class="code" id="wheeldata" ></div>
+    <div class="codemiddle" id="sankeyproddata" ></div>
+    <div class="codemiddle" id="sankeyconsdata" ></div>
+    <div class="code" id="topfivedata" ></div>
+
+    <script>
+     var data = {};
+     window.onload = function() {data = loaddata(); updatedata(); }
+
+     function updatedata()
+     {
+		 var region = document.getElementById("region").value;
+		 var year = document.getElementById("year").value;
+		 var valuetype = document.getElementById("units").value;
+		 var hierarchy = document.getElementById("hierarchy").value;
+		 var adjoiningyears = -1;
+       
+	   var wheeldata = getwheeldata(region, year, valuetype, adjoiningyears);
+       var sankeyproddata = getsankeydata(region, year, valuetype, 'production', hierarchy, 'left');
+       var sankeyconsdata = getsankeydata(region, year, valuetype, 'consumption', hierarchy, 'right');
+       
+	   var flowlist = ['Total Production', 'Total Consumption', 'Renewable', 'Nuclear', 'Combustion'];
+	   var topfivedata = gettopfivedata(year, valuetype, flowlist);
+       
+	   displayJSON(wheeldata, 'Wheel', 'wheeldata');
+       displayJSON([sankeyproddata], 'Sankey Production', 'sankeyproddata');
+       displayJSON([sankeyconsdata], 'Sankey Consumption Data', 'sankeyconsdata');
+       displayJSON(topfivedata, 'Top Five', 'topfivedata');
+     }
+
+     function displayJSON(o, label, id)
+     {
+       var s = "";
+       o.forEach(function(item, index, array)
+         {
+           s = s + JSON.stringify(item, null, '  ') + "\n";
+         });
+       s = "<hr/><br/><strong>" + label + "</strong><br/><hr/>" + "<pre>" + s;
+       s = s + "</pre>" + "<hr/>";
+       document.getElementById(id).innerHTML = s;
+     }
+    </script>
+
+  </body>
+</html>
