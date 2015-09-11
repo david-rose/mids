@@ -12,7 +12,8 @@ usage()
     echo $FIND_WORD each chunk will be grepCounted in parallel
 }
 #Splitting $ORIGINAL_FILE INTO CHUNKS
-split -b $BLOCK_SIZE $ORIGINAL_FILE $CHUNK_FILE_PREFIX
+#split -b $BLOCK_SIZE $ORIGINAL_FILE $CHUNK_FILE_PREFIX
+split -l 10 $ORIGINAL_FILE $CHUNK_FILE_PREFIX
 #DISTRIBUTE
 for file in $CHUNK_FILE_PREFIX*
 do
