@@ -4,7 +4,7 @@
 '''
 from __future__ import print_function
 from random import randint
-minrange = 10
+minrange = 0
 maxrange = 99
 randcount = 10000
 with open('randomnumbers.txt', 'w') as fout:
